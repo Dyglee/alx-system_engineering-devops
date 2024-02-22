@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# This script displays "Best School" 10 times and HI on 9th
+# This script displays "Best School" 10 times and "Hi" on the 9th line
 
 count=1
 while [ $count -le 10 ]; do
+    if [ $count -eq 9 ]; then
+        echo -e "Best School\nHi"
+    else
         echo "Best School"
-if [ $count -eq 9 ]; then
-	echo -e "Best School\nHi"
-fi
-        ((count++))
+    fi
+    ((count++))
 done
