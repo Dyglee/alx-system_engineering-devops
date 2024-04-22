@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Install Nginx
+if ! wich ngingx > /dev/null; then
+	apt update
+	apt install -y nginx
+fi
+
+# create HTML file 
+echo "Hello World!" > var/www/html/index.html
+
+#restart nginx
+service nginx restart
