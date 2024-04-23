@@ -5,8 +5,8 @@
 apt-get update
 apt-get install -y nginx
 
-# Correct the document root and write "Holberton School" to the index.html
-echo "Holberton School" > /var/www/html/index.html
+# Correct the document root and write "Hello World!" to the index.html
+echo "Hello World!" > /var/www/html/index.html
 
 # Configure Nginx to handle redirection and serve the updated index file
 cat > /etc/nginx/sites-available/default <<EOF
