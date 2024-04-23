@@ -1,12 +1,36 @@
 #!/usr/bin/env bash
 # Install Nginx
-if ! wich ngingx > /dev/null; then
-	apt update
-	apt install -y nginx
+apt update && apt install -y nginx
+
+# Check if Nginx is installed
+if ! command -v nginx > /dev/null; then
+    echo "Nginx failed to install"
+    exit 1
 fi
 
-# create HTML file 
-echo "Hello World!" > var/www/html/index.html
+# Create a simple HTML file
+echo "Hello World!" > /var/www/html/index.html
 
-#restart nginx
+# Configure Nginx to use this file as the response for root URL
+cat > /etc/nginx/sites-available/default <<EOF
+server {
+    listen 80;
+    server_name _;
+
+    location / {
+        root /var/www/html;
+        index index.html index.htm;
+    }
+}
+EOF
+
+# Instead of using systemctl, use service to restart Nginx
 service nginx restart
+
+# Ensure Nginx is up and running
+if ! service nginx status | grep -q 'is running'; then
+    echo "Nginx failed to start"
+    exit 1
+fi
+
+echo "Nginx has been configured successfully."
