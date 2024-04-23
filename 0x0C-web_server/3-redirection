@@ -1,33 +1,30 @@
 #!/usr/bin/env bash
-# Ensure the script is run as root
-if [ "$EUID" -ne 0 ]
-  then echo "Please run as root"
-  exit
-fi
+# Installs Nginx web server and configures web content and redirection
 
-# Step 1: Install Nginx if it isn't installed
-if ! which nginx > /dev/null; then
-    apt-get update
-    apt-get install -y nginx
-fi
+# Update packages and install Nginx
+apt-get update
+apt-get install -y nginx
 
-# Step 2: Configure redirection
-# Define the server block configuration
-CONFIG='server {
-    listen 80;
-    server_name _;
+# Correct the document root and write "Holberton School" to the index.html
+echo "Holberton School" > /var/www/html/index.html
+
+# Configure Nginx to handle redirection and serve the updated index file
+cat > /etc/nginx/sites-available/default <<EOF
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /var/www/html;
+    index index.html;
+
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
 
     location /redirect_me {
-        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
+        return 301 https://twitter.com/Emmanue17280546;
     }
-}'
+}
+EOF
 
-# Backup the original default config
-cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
-
-# Write the new configuration to the default config file
-echo "$CONFIG" > /etc/nginx/sites-available/default
-
-# Step 3: Restart Nginx using service
-service nginx restart
-
+# Test configuration and restart Nginx
+nginx -t && service nginx restart
