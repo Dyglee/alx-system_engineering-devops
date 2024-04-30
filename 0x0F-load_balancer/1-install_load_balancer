@@ -1,36 +1,43 @@
 #!/usr/bin/env bash
-# Configures HAProxy on 531087-lb-01 to balance traffic for moussafir.tech
+# Install and configure HAProxy to load balance between two web servers
 
-# Install HAProxy on the server
-apt-get -y update
-apt-get -y install haproxy=1.6.*
+# Define variables
+STUDENT_ID="531087"
+WEB_01="${STUDENT_ID}-web-01"
+WEB_02="${STUDENT_ID}-web-02"
+LB_NAME="${STUDENT_ID}-lb-01"
 
-# Ensure HAProxy is enabled to start at boot
+# Run as root
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root" 
+   exit 1
+fi
+
+# Update and install HAProxy
+apt-get update
+apt-get install -y haproxy
+
+# Enable HAProxy to start at boot
 systemctl enable haproxy
 
-# Backup the original HAProxy configuration file
-cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
-
-# Configure HAProxy configuration file to distribute requests using a roundrobin algorithm
-cat <<EOF > /etc/haproxy/haproxy.cfg
+# Configure HAProxy
+cat <<EOF >/etc/haproxy/haproxy.cfg
 global
-    log /dev/log    local0
-    log /dev/log    local1 notice
-    chroot /var/lib/haproxy
-    stats socket /run/haproxy/admin.sock mode 660 level admin
-    stats timeout 30s
+    log /dev/log local0
+    log /dev/log local1 notice
+    maxconn 2000
     user haproxy
     group haproxy
     daemon
 
 defaults
-    log     global
-    mode    http
-    option  httplog
-    option  dontlognull
+    log global
+    mode http
+    option httplog
+    option dontlognull
     timeout connect 5000ms
-    timeout client  50000ms
-    timeout server  50000ms
+    timeout client 50000ms
+    timeout server 50000ms
     errorfile 400 /etc/haproxy/errors/400.http
     errorfile 403 /etc/haproxy/errors/403.http
     errorfile 408 /etc/haproxy/errors/408.http
@@ -39,18 +46,20 @@ defaults
     errorfile 503 /etc/haproxy/errors/503.http
     errorfile 504 /etc/haproxy/errors/504.http
 
-frontend main_front
+frontend http_front
     bind *:80
-    default_backend web_servers
+    stats uri /haproxy?stats
+    default_backend webservers
 
-backend web_servers
+backend webservers
     balance roundrobin
-    server 531087-web-01 54.237.7.136 check
-    server 531087-web-02 54.85.9.73 check
+    server ${WEB_01} 54.237.7.136:80 check
+    server ${WEB_02} 54.85.9.73:80 check
 EOF
 
 # Restart HAProxy to apply changes
 systemctl restart haproxy
 
 # Output success message
-echo "HAProxy has been configured and restarted successfully on 531087-lb-01 for moussafir.tech."
+echo "HAProxy has been configured on ${LB_NAME} and is load balancing ${WEB_01} and ${WEB_02}."
+
