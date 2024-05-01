@@ -1,22 +1,7 @@
 #!/usr/bin/env bash
-# This script configures Nginx to listen on port 80
 
-# Ensure the script is run as root
-if [ "$(id -u)" -ne 0 ]; then
-    echo "Please run this script as root."
-    exit 1
-fi
+# Update Nginx configuration to listen on port 80
+sed -i 's/^\s*listen\s*\(.*\)/listen 80;/g' /etc/nginx/sites-available/default
 
-# Update Nginx configuration to listen on port 80 for IPv4 and IPv6
-sed -i 's/^\s*listen\s*\(\[::\]:\)\?80.*$/listen 80;/g' /etc/nginx/sites-available/default
-sed -i 's/^\s*listen\s*\(\[::\]:\)\?8080.*$/listen [::]:80 ipv6only=on;/g' /etc/nginx/sites-available/default
-
-# Test Nginx configuration
-if nginx -t; then
-    # Restart Nginx service if the test passes
-    service nginx restart
-    echo "Nginx has been successfully configured to listen on port 80 and restarted."
-else
-    echo "Failed to update Nginx configuration. Please check for errors."
-    exit 1
-fi:
+# Restart Nginx service
+service nginx restart
