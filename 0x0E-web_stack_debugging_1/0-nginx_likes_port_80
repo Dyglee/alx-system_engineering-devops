@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
-# #This script is for debuggin
+# Configure Nginx to listen on port 80 and restart the service
 
-#Update Nginx configuration to listen on port 80
-sed -i 's/^\s*listen\s*\(.*\)/listen 80;/g' /etc/nginx/sites-available/default
+# Ensure that Nginx is set to listen on port 80
+if ! grep -q 'listen 80;' /etc/nginx/sites-available/default; then
+    # Assuming that the file has an existing 'listen' directive that needs to be changed
+    sed -i 's/listen .*/listen 80;/' /etc/nginx/sites-available/default
+else
+    echo "Nginx is already configured to listen on port 80."
+fi
 
-#Restart Nginx service
+# Restart Nginx to apply the changes
 service nginx restart
