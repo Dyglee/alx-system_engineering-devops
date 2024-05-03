@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # Update Nginx configuration to listen on port 80
 sed -i 's/^\s*listen\s*\(.*\)/listen 80;/g' /etc/nginx/sites-available/default
 
