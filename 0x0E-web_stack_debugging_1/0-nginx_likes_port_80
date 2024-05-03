@@ -4,7 +4,7 @@
 
 # Ensure that Nginx is set to listen on port 80
 if ! grep -q 'listen 80;' /etc/nginx/sites-available/default; then
-    # Assuming that the file has an existing 'listen' directive that needs to be changed
+
     sed -i 's/listen .*/listen 80;/' /etc/nginx/sites-available/default
 else
     echo "Nginx is already configured to listen on port 80."
