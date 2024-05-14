@@ -10,10 +10,7 @@ fi
 MYSQL_ROOT_PASSWORD="$1"
 
 # Dump all MySQL databases with the provided password
-mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" --all-databases > backup.sql
-
-# Check if mysqldump was successful
-if [ $? -ne 0 ]; then
+if ! mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" --all-databases > backup.sql; then
   echo "Error: Failed to dump databases"
   exit 1
 fi
