@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # Ensure Apache is stopped and disabled
 systemctl stop apache2
 systemctl disable apache2
@@ -15,5 +16,5 @@ sed -i 's/listen 80;/listen 8080;/g' /etc/nginx/sites-available/default
 systemctl restart nginx
 
 # Verify that Nginx is running as nginx user and listening on port 8080
-ps auxff | grep ngin[x]
-nc -z 0 8080 ; echo $?
+pgrep -u nginx nginx
+nc -z 0 8080; echo $?
